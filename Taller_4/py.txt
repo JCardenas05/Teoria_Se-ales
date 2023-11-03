@@ -1,0 +1,125 @@
+# Generación de datos simbólicos
+a1 = 1       # Valor del símbolo a1
+a0 = -1      # Valor del símbolo a0
+Nsamples = 128 # Muestras de tiempo por símbolo
+# Probabilidades de los símbolos
+p_0 = 0.9
+p_1 = 1 - p_0
+
+Nsymbols = 32  # Número total de símbolos
+N = Nsymbols * Nsamples  # Número total de muestras
+
+# Genera una secuencia de símbolos basados en las probabilidades dadas
+data = np.random.choice([a0, a1], size=Nsymbols, p=[p_0, p_1])
+# Repite cada símbolo según el número de muestras por símbolo
+data = np.concatenate([[v]*Nsamples for v in data])
+message = data  # Almacena la secuencia completa en la variable 'message'
+
+#luego de haber aplicado el método de Cross Validation y verificar su funcionamiento, se identificó que este 
+# presenta un costo computacional muy alto, por ello se de propone la implementación
+# de la regla de Silverman la cual genera resultados mucho mas rápidos pero un poco menos precisos
+
+def kde_function(signal_x,eval_points=None,method="Silverman",res=500):
+    """
+    Aplica el método de KDE gaussiano a la señal proporcionada y ajusta
+    automáticamente el ancho de banda mediante una búsqueda en la cuadrícula.
+
+    Parámetros:
+    - signal: Señal a la que se aplica KDE.
+    - eval_points: puntos de evaluación
+    - method: método
+
+    Retorna:
+    - eval_points: Vector de evaluación.
+    - y_sp: Función de densidad estimada en los puntos de evaluación.
+    """
+    if eval_points is None:
+        eval_points = np.linspace(np.min(signal_x), np.max(signal_x),res)
+
+    if method == 'Silverman':
+        n = len(signal_x)
+        sigma = np.std(signal_x)
+        optimal_bandwidth = (4 / (3 * n)) ** (1 / 5) * sigma
+
+        print(f'Method:{method}\nOptimal bandwidth: {optimal_bandwidth:.2f}')
+        kde = scipy.stats.gaussian_kde(signal_x, bw_method=optimal_bandwidth)
+        y_sp = kde.pdf(eval_points)
+
+    elif method == 'Cross Validation':
+        # Define los posibles valores para el ancho de banda
+        bandwidths = np.arange(0.05, 2, 0.05)
+
+        # Crea y configura el objeto para la búsqueda en la cuadrícula
+        kde = KernelDensity(kernel='gaussian')
+
+        grid = GridSearchCV(kde, {'bandwidth': bandwidths})
+        grid.fit(signal_x.reshape(-1, 1))
+        # Obtiene el mejor estimador y su ancho de banda óptimo
+        kde_optimal = grid.best_estimator_
+        optimal_bandwidth = kde_optimal.bandwidth
+        print(f'Optimal bandwidth: {optimal_bandwidth:.2f}')
+
+        log_dens = kde_optimal.score_samples(eval_points.reshape(-1, 1))
+        y_sp = np.exp(log_dens)
+    
+    else: return
+
+    return (eval_points, y_sp)
+
+
+# Definición del vector de tiempo
+time = np.linspace(0, N, N)
+# Cálculo del número de bins usando la regla de Sturges
+Nbins = int(1 + 3.322*np.log2(len(data)))
+weight = np.ones_like(message) / N  # Pesos para el histograma
+
+# Creación de gráficos
+fig, ax = plt.subplots(2, 1, tight_layout=True)
+
+# Generación de ruido gaussiano de media cero
+σ2 = 1  # Varianza del ruido
+noise = np.random.normal(0, σ2, N)
+
+#ruido como una distribucion raice np.rice
+
+
+
+# Estimación de la pdf del ruido
+x_train  = generate_data(Nsamples)[:, np.newaxis]
+
+pdf_x, pdf_y = kde_function(noise,method='Cross Validation')
+
+# Visualización del ruido y su pdf
+ax[0].plot(time, noise)
+ax[1].plot(pdf_x, pdf_y, "-r")
+coloredhist(noise, plot=1)
+ax[0].set_xlim(0, len(message))
+
+# Generación de la señal corrupta sumando el mensaje y el ruido
+y = message + noise
+y_pdf_x, y_pdf_y = kde_function(y)
+fig, ax = plt.subplots(2, 1, tight_layout=True)
+ax[0].step(time, y, '-')
+ax[0].set_title('Señal corrupta por ruido')
+ax[0].set_xlim(0, N)
+ax[0].step(time, message, '-r')
+coloredhist(y, plot=1)
+ax[1].plot(y_pdf_x, y_pdf_y)
+plt.show()
+
+
+# Definición de parámetros para el filtro suavizante
+R = 3000
+C = .0003
+num = [1]
+den = [R * C, 1]
+
+# Obtención de la respuesta al impulso y función de transferencia del filtro
+lti_system = lti(num, den)
+t, h = lti_system.impulse(N)
+coeff = fftshift(fft(h))
+f = fftshift(fftfreq(coeff.shape[0], t[1] - t[0]))
+
+# Aplicación del filtro a la señal corrupta
+_, output0_, _ = lti_system.output(y, time)
+output_pdf = kde_function(output0_, method = "Cross Validation")
