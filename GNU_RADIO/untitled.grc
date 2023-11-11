@@ -151,59 +151,6 @@ blocks:
     coordinate: [232, 176.0]
     rotation: 0
     state: enabled
-- name: epy_block_1
-  id: epy_block
-  parameters:
-    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
-      \ GRC will instantiate the first class it finds\nto get ports and parameters\
-      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
-      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
-      from sklearn.neighbors import KernelDensity\nfrom sklearn.model_selection import\
-      \ GridSearchCV\nimport scipy.stats\nfrom gnuradio import gr\n\n\nclass blk(gr.sync_block):\
-      \  # other base classes are basic_block, decim_block, interp_block\n    \"\"\
-      \"Embedded Python Block example - a simple multiply const\"\"\"\n\n    def __init__(self,\
-      \ example_param=1.0):  # only default arguments here\n        \"\"\"arguments\
-      \ to this function show up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n\
-      \            self,\n            name='Embedded Python Block',   # will show\
-      \ up in GRC\n            in_sig=[np.float32],\n            out_sig=[np.float32]\n\
-      \        )\n        # if an attribute with the same name as a parameter is found,\n\
-      \        # a callback is registered (properties work, too).\n        self.example_param\
-      \ = example_param\n        print('Se genero esto')\n        \n    def kde_function(signal_x,eval_points=None,method=\"\
-      Silverman\",res=500):\n    \t\n        if method == 'Silverman':\n         \
-      \   n = len(signal_x)\n            sigma = np.std(signal_x)\n            optimal_bandwidth\
-      \ = (4 / (3 * n)) ** (1 / 5) * sigma\n            print(f'Method:{method}\\\
-      nOptimal bandwidth: {optimal_bandwidth:.2f}')\n\n        elif method == 'Cross\
-      \ Validation':\n            # Define los posibles valores para el ancho de banda\n\
-      \            bandwidths = np.arange(0.05, 2, 0.05)\n\n            # Crea y configura\
-      \ el objeto para la b\xFAsqueda en la cuadr\xEDcula\n            kde = KernelDensity(kernel='gaussian')\n\
-      \            grid = GridSearchCV(kde, {'bandwidth': bandwidths})\n         \
-      \   grid.fit(signal_x.reshape(-1, 1))\n\n            # Obtiene el mejor estimador\
-      \ y su ancho de banda \xF3ptimo\n            kde_optimal = grid.best_estimator_\n\
-      \            optimal_bandwidth = kde_optimal.bandwidth\n            print(f'Optimal\
-      \ bandwidth: {optimal_bandwidth:.2f}')\n\n        else:\n            print('Error')\n\
-      \            return\n            \n        kde = scipy.stats.gaussian_kde(signal_x,\
-      \ bw_method=optimal_bandwidth)\n\n        if eval_points is None:\n        \
-      \    eval_points = np.linspace(np.min(signal_x), np.max(signal_x),res)\n   \
-      \         \n        y_sp = kde.pdf(eval_points)\n            \n        return\
-      \ (eval_points, y_sp)\n\n    def work(self, input_items, output_items):\n  \
-      \      \"\"\"example: multiply with constant\"\"\"\n        output_items[0][:]\
-      \ = input_items[0] * self.example_param\n        return len(output_items[0])\n"
-    affinity: ''
-    alias: ''
-    comment: ''
-    example_param: '1.0'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-  states:
-    _io_cache: ('Embedded Python Block', 'blk', [('example_param', '1.0')], [('0',
-      'float', 1)], [('0', 'float', 1)], 'Embedded Python Block example - a simple
-      multiply const', ['example_param'])
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [936, 272.0]
-    rotation: 0
-    state: true
 - name: qtgui_histogram_sink_x_0
   id: qtgui_histogram_sink_x
   parameters:
@@ -345,7 +292,7 @@ blocks:
     marker8: '-1'
     marker9: '-1'
     name: '""'
-    nconnections: '2'
+    nconnections: '1'
     size: '2000'
     srate: samp_rate
     stemplot: 'False'
@@ -385,18 +332,37 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [968, 448.0]
+    coordinate: [960, 376.0]
+    rotation: 0
+    state: true
+- name: zeromq_pub_sink_0
+  id: zeromq_pub_sink
+  parameters:
+    address: tcp://0.0.0.0:5000
+    affinity: ''
+    alias: ''
+    comment: ''
+    hwm: '-1'
+    key: ''
+    pass_tags: 'False'
+    timeout: '100'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [960, 264.0]
     rotation: 0
     state: true
 
 connections:
 - [analog_noise_source_x_0, '0', blocks_add_xx_0, '1']
 - [blocks_add_xx_0, '0', blocks_throttle_0, '0']
-- [blocks_throttle_0, '0', epy_block_1, '0']
 - [blocks_throttle_0, '0', qtgui_histogram_sink_x_0, '0']
 - [blocks_throttle_0, '0', qtgui_time_sink_x_0, '0']
+- [blocks_throttle_0, '0', zeromq_pub_sink_0, '0']
 - [epy_block_0, '0', blocks_add_xx_0, '0']
-- [epy_block_1, '0', qtgui_time_sink_x_0, '1']
 
 metadata:
   file_format: 1
