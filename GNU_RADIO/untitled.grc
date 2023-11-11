@@ -115,8 +115,8 @@ blocks:
       \ example - a simple multiply const\"\"\"\n\n    def __init__(self, p_simbol_0=0.5,\
       \ a0=-1, a1=1, Nsamples=20, Nsymbols=100 ):  # only default arguments here\n\
       \        \"\"\"arguments to this function show up as parameters in GRC\"\"\"\
-      \n        gr.sync_block.__init__(\n            self,\n            name='Embedded\
-      \ Python Block',   # will show up in GRC\n            in_sig= None, #[np.float32],\n\
+      \n        gr.sync_block.__init__(\n            self,\n            name='Generador\
+      \ de Simbolos',   # will show up in GRC\n            in_sig= None, #[np.float32],\n\
       \            out_sig=[np.float32]\n        )\n        \n        self.p_0 = p_simbol_0\
       \ #probabilidad de generaci\xF3n s\xEDmbolo 1\n        self.p_1 = 1-self.p_0\
       \ #probabilidad de generaci\xF3n s\xEDmbolo 2\n        self.a0 = a0\n      \
@@ -141,7 +141,7 @@ blocks:
     minoutbuf: '0'
     p_simbol_0: '0.5'
   states:
-    _io_cache: ('Embedded Python Block', 'blk', [('p_simbol_0', '0.5'), ('a0', '-1'),
+    _io_cache: ('Generador de Simbolos', 'blk', [('p_simbol_0', '0.5'), ('a0', '-1'),
       ('a1', '1'), ('Nsamples', '20'), ('Nsymbols', '100')], [], [('0', 'float', 1)],
       'Embedded Python Block example - a simple multiply const', ['Nsamples', 'Nsymbols',
       'a0', 'a1'])
@@ -168,7 +168,7 @@ blocks:
       \ up in GRC\n            in_sig=[np.float32],\n            out_sig=[np.float32]\n\
       \        )\n        # if an attribute with the same name as a parameter is found,\n\
       \        # a callback is registered (properties work, too).\n        self.example_param\
-      \ = example_param\n        \n    def kde_function(signal_x,eval_points=None,method=\"\
+      \ = example_param\n        print('Se genero esto')\n        \n    def kde_function(signal_x,eval_points=None,method=\"\
       Silverman\",res=500):\n    \t\n        if method == 'Silverman':\n         \
       \   n = len(signal_x)\n            sigma = np.std(signal_x)\n            optimal_bandwidth\
       \ = (4 / (3 * n)) ** (1 / 5) * sigma\n            print(f'Method:{method}\\\

@@ -27,6 +27,7 @@ class blk(gr.sync_block):  # other base classes are basic_block, decim_block, in
         # if an attribute with the same name as a parameter is found,
         # a callback is registered (properties work, too).
         self.example_param = example_param
+        print('Se genero esto')
         
     def kde_function(signal_x,eval_points=None,method="Silverman",res=500):
     	

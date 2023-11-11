@@ -17,7 +17,7 @@ class blk(gr.basic_block):  # other base classes are basic_block, decim_block, i
         """arguments to this function show up as parameters in GRC"""
         gr.sync_block.__init__(
             self,
-            name='Embedded Python Block',   # will show up in GRC
+            name='Generador de Simbolos',   # will show up in GRC
             in_sig= None, #[np.float32],
             out_sig=[np.float32]
         )
