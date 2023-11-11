@@ -37,29 +37,12 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '32000'
+    value: '30000'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
     coordinate: [208, 8.0]
-    rotation: 0
-    state: true
-- name: audio_sink_0
-  id: audio_sink
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    device_name: ''
-    num_inputs: '1'
-    ok_to_block: 'True'
-    samp_rate: '32000'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [984, 208.0]
     rotation: 0
     state: true
 - name: band_pass_filter_0
@@ -71,20 +54,20 @@ blocks:
     comment: ''
     decim: '1'
     gain: '1'
-    high_cutoff_freq: '100'
+    high_cutoff_freq: '15000'
     interp: '1'
-    low_cutoff_freq: '50'
+    low_cutoff_freq: '1000'
     maxoutbuf: '0'
     minoutbuf: '0'
     samp_rate: samp_rate
     type: fir_filter_fff
-    width: '10000'
+    width: '15000'
     win: window.WIN_HAMMING
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [672, 148.0]
+    coordinate: [624, 160.0]
     rotation: 0
     state: true
 - name: blocks_throttle_0
@@ -103,7 +86,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [448, 208.0]
+    coordinate: [424, 216.0]
     rotation: 0
     state: true
 - name: qtgui_histogram_sink_x_0
@@ -184,21 +167,22 @@ blocks:
     width7: '1'
     width8: '1'
     width9: '1'
-    xmax: '1'
-    xmin: '-1'
+    xmax: '5'
+    xmin: '-5'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [984, 272.0]
+    coordinate: [856, 176.0]
     rotation: 0
     state: true
 - name: zeromq_sub_source_0
   id: zeromq_sub_source
   parameters:
-    address: tcp://192.168.1.10:5000
+    address: tcp://192.168.1.13:5000
     affinity: ''
     alias: ''
+    bind: 'False'
     comment: ''
     hwm: '-1'
     key: ''
@@ -217,10 +201,10 @@ blocks:
     state: true
 
 connections:
-- [band_pass_filter_0, '0', audio_sink_0, '0']
 - [band_pass_filter_0, '0', qtgui_histogram_sink_x_0, '0']
 - [blocks_throttle_0, '0', band_pass_filter_0, '0']
 - [zeromq_sub_source_0, '0', blocks_throttle_0, '0']
 
 metadata:
   file_format: 1
+  grc_version: 3.10.7.0

@@ -6,24 +6,11 @@
 #
 # GNU Radio Python Flow Graph
 # Title: Not titled yet
-# GNU Radio version: 3.10.1.1
+# GNU Radio version: 3.10.7.0
 
 from packaging.version import Version as StrictVersion
-
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print("Warning: failed to XInitThreads()")
-
 from PyQt5 import Qt
 from gnuradio import qtgui
-import sip
-from gnuradio import audio
 from gnuradio import blocks
 from gnuradio import filter
 from gnuradio.filter import firdes
@@ -31,14 +18,14 @@ from gnuradio import gr
 from gnuradio.fft import window
 import sys
 import signal
+from PyQt5 import Qt
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import zeromq
+import sip
 
 
-
-from gnuradio import qtgui
 
 class untitled(gr.top_block, Qt.QWidget):
 
@@ -49,8 +36,8 @@ class untitled(gr.top_block, Qt.QWidget):
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
-        except:
-            pass
+        except BaseException as exc:
+            print(f"Qt GUI: Could not set Icon: {str(exc)}", file=sys.stderr)
         self.top_scroll_layout = Qt.QVBoxLayout()
         self.setLayout(self.top_scroll_layout)
         self.top_scroll = Qt.QScrollArea()
@@ -70,23 +57,24 @@ class untitled(gr.top_block, Qt.QWidget):
                 self.restoreGeometry(self.settings.value("geometry").toByteArray())
             else:
                 self.restoreGeometry(self.settings.value("geometry"))
-        except:
-            pass
+        except BaseException as exc:
+            print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
 
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 32000
+        self.samp_rate = samp_rate = 30000
 
         ##################################################
         # Blocks
         ##################################################
-        self.zeromq_sub_source_0 = zeromq.sub_source(gr.sizeof_float, 1, 'tcp://192.168.1.10:5000', 100, False, -1, '')
+
+        self.zeromq_sub_source_0 = zeromq.sub_source(gr.sizeof_float, 1, 'tcp://192.168.1.13:5000', 100, False, (-1), '', False)
         self.qtgui_histogram_sink_x_0 = qtgui.histogram_sink_f(
             1024,
             100,
-            -1,
-            1,
+            (-5),
+            5,
             "",
             1,
             None # parent
@@ -131,18 +119,16 @@ class untitled(gr.top_block, Qt.QWidget):
             firdes.band_pass(
                 1,
                 samp_rate,
-                50,
-                100,
-                10000,
+                1000,
+                15000,
+                15000,
                 window.WIN_HAMMING,
                 6.76))
-        self.audio_sink_0 = audio.sink(32000, '', True)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.band_pass_filter_0, 0), (self.audio_sink_0, 0))
         self.connect((self.band_pass_filter_0, 0), (self.qtgui_histogram_sink_x_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.band_pass_filter_0, 0))
         self.connect((self.zeromq_sub_source_0, 0), (self.blocks_throttle_0, 0))
@@ -161,7 +147,7 @@ class untitled(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.band_pass_filter_0.set_taps(firdes.band_pass(1, self.samp_rate, 50, 100, 10000, window.WIN_HAMMING, 6.76))
+        self.band_pass_filter_0.set_taps(firdes.band_pass(1, self.samp_rate, 1000, 15000, 15000, window.WIN_HAMMING, 6.76))
         self.blocks_throttle_0.set_sample_rate(self.samp_rate)
 
 
