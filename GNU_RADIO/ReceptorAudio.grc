@@ -86,7 +86,43 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [424, 216.0]
+    coordinate: [376, 216.0]
+    rotation: 0
+    state: true
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      from gnuradio import gr\n\n\nclass blk(gr.sync_block):  # other base classes\
+      \ are basic_block, decim_block, interp_block\n    \"\"\"Embedded Python Block\
+      \ example - a simple multiply const\"\"\"\n\n    def __init__(self, umbral=0):\
+      \  # only default arguments here\n        \"\"\"arguments to this function show\
+      \ up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n         \
+      \   self,\n            name='Decodificaro_Simbolos',   # will show up in GRC\n\
+      \            in_sig=[np.float32],\n            out_sig=[np.float32]\n      \
+      \  )\n        # if an attribute with the same name as a parameter is found,\n\
+      \        # a callback is registered (properties work, too).\n        self.umbral\
+      \ = umbral \n\n    def work(self, input_items, output_items):\n        \"\"\"\
+      example: multiply with constant\"\"\"\n        umbral = self.umbral\n      \
+      \  output_items[0][:] = [-1 if value <= umbral else 1 for value in input_items[0]]\n\
+      \        return len(output_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    umbral: '0'
+  states:
+    _io_cache: ('Decodificaro_Simbolos', 'blk', [('umbral', '0')], [('0', 'float',
+      1)], [('0', 'float', 1)], 'Embedded Python Block example - a simple multiply
+      const', ['umbral'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [880, 184.0]
     rotation: 0
     state: true
 - name: qtgui_histogram_sink_x_0
@@ -173,7 +209,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [856, 176.0]
+    coordinate: [1144, 144.0]
     rotation: 0
     state: true
 - name: zeromq_sub_source_0
@@ -182,7 +218,6 @@ blocks:
     address: tcp://192.168.1.13:5000
     affinity: ''
     alias: ''
-    bind: 'False'
     comment: ''
     hwm: '-1'
     key: ''
@@ -196,15 +231,15 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [184, 184.0]
+    coordinate: [88, 192.0]
     rotation: 0
     state: true
 
 connections:
-- [band_pass_filter_0, '0', qtgui_histogram_sink_x_0, '0']
+- [band_pass_filter_0, '0', epy_block_0, '0']
 - [blocks_throttle_0, '0', band_pass_filter_0, '0']
+- [epy_block_0, '0', qtgui_histogram_sink_x_0, '0']
 - [zeromq_sub_source_0, '0', blocks_throttle_0, '0']
 
 metadata:
   file_format: 1
-  grc_version: 3.10.7.0

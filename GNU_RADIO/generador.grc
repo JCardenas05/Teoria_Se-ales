@@ -37,7 +37,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '5000'
+    value: '30000'
   states:
     bus_sink: false
     bus_source: false
@@ -80,25 +80,6 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [520, 280.0]
-    rotation: 0
-    state: true
-- name: blocks_throttle_0
-  id: blocks_throttle
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    ignoretag: 'True'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    samples_per_second: samp_rate
-    type: float
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [632, 288.0]
     rotation: 0
     state: true
 - name: epy_block_0
@@ -235,7 +216,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [960, 112.0]
+    coordinate: [664, 128.0]
     rotation: 0
     state: true
 - name: qtgui_time_sink_x_0
@@ -332,7 +313,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [960, 376.0]
+    coordinate: [664, 368.0]
     rotation: 0
     state: true
 - name: zeromq_pub_sink_0
@@ -352,16 +333,15 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [960, 264.0]
+    coordinate: [664, 264.0]
     rotation: 0
     state: true
 
 connections:
 - [analog_noise_source_x_0, '0', blocks_add_xx_0, '1']
-- [blocks_add_xx_0, '0', blocks_throttle_0, '0']
-- [blocks_throttle_0, '0', qtgui_histogram_sink_x_0, '0']
-- [blocks_throttle_0, '0', qtgui_time_sink_x_0, '0']
-- [blocks_throttle_0, '0', zeromq_pub_sink_0, '0']
+- [blocks_add_xx_0, '0', qtgui_histogram_sink_x_0, '0']
+- [blocks_add_xx_0, '0', qtgui_time_sink_x_0, '0']
+- [blocks_add_xx_0, '0', zeromq_pub_sink_0, '0']
 - [epy_block_0, '0', blocks_add_xx_0, '0']
 
 metadata:
