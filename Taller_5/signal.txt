@@ -1,0 +1,41 @@
+a1 = 1       # Valor del símbolo a1
+a0 = 0    # Valor del símbolo a0
+
+# Probabilidades de los símbolos
+p_0 = 0.5
+p_1 = 1 - p_0
+
+Nsamples = 500
+Nsymbols = 6000 # Número total de símbolos
+N = Nsymbols * Nsamples  # Número total de muestras
+points_noise = 30
+
+amp_noise=np.linspace(0.2,5,points_noise)
+
+message_org=[]
+message_corrupt=[]
+Nsymbols_noise=Nsymbols//points_noise
+
+print(f'Simbolos por ruido: {Nsymbols_noise}')
+
+for a in amp_noise:
+    message_corrupt_, message_org_, _ = generate_symbols(a0, a1, Nsamples=Nsamples, Nsymbols=Nsymbols_noise, var_noise=a)
+    message_corrupt.extend(message_corrupt_)
+    message_org.extend(message_org_)
+    
+time = np.linspace(0, N, N)
+message_org = np.array(np.split(np.array(message_org), Nsymbols))
+message_corrupt = map_range(np.array(message_corrupt), a0, a1)
+
+print(message_corrupt.shape)
+print(message_org.shape)
+
+sym_print=6
+
+plt.figure(figsize=(10,5),tight_layout=True) 
+plt.title("Datos de entrenamiento")
+plt.plot(time[0:200*Nsamples*sym_print],message_org[:200*sym_print].flatten(), color='blue', alpha=(1), label='Señal Original')
+plt.plot(time[0:200*Nsamples*sym_print],message_corrupt[:200*sym_print].flatten(), color='green', alpha=0.5, label=f'Señal Con Ruido' )
+plt.axhline((a0+a1)/2, color=(0,0,0,0.2), linestyle='--')  
+plt.legend()
+plt.show()
